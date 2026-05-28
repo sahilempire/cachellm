@@ -5,6 +5,7 @@ export { PromptAnalyzer } from './core/analyzer.js'
 export { selectBreakpoints, estimateSavings } from './core/strategy.js'
 export { estimateTokens } from './core/token-estimator.js'
 export { StatsTracker } from './stats/tracker.js'
+export { createVercelAIMiddleware, VercelAICacheMiddleware } from './middleware/vercel-ai.js'
 
 export type {
   CacheOptions,

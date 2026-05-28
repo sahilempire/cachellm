@@ -46,6 +46,16 @@
         "types": "./dist/providers/gemini.d.cts",
         "default": "./dist/providers/gemini.cjs"
       }
+    },
+    "./middleware/vercel-ai": {
+      "import": {
+        "types": "./dist/middleware/vercel-ai.d.ts",
+        "default": "./dist/middleware/vercel-ai.js"
+      },
+      "require": {
+        "types": "./dist/middleware/vercel-ai.d.cts",
+        "default": "./dist/middleware/vercel-ai.cjs"
+      }
     }
   },
   "files": [
@@ -92,7 +102,8 @@
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.30.0",
     "openai": ">=4.60.0",
-    "@google/generative-ai": ">=0.21.0"
+    "@google/generative-ai": ">=0.21.0",
+    "ai": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "@anthropic-ai/sdk": {
@@ -102,6 +113,9 @@
       "optional": true
     },
     "@google/generative-ai": {
+      "optional": true
+    },
+    "ai": {
       "optional": true
     }
   },
