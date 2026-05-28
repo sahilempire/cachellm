@@ -60,6 +60,100 @@ const btnFilled: React.CSSProperties = {
   ...btnOutline, background: ink, color: paper,
 };
 
+// ── interactive calculator ──────────────────────────────────────────
+const MODELS = {
+  anthropic: [
+    { name: 'Claude Sonnet', id: 'claude-sonnet-4-20250514', input: 3, cached: 0.3, output: 15 },
+    { name: 'Claude Opus', id: 'claude-opus-4-20250514', input: 15, cached: 1.5, output: 75 },
+    { name: 'Claude Haiku', id: 'claude-haiku-3-5-20241022', input: 0.8, cached: 0.08, output: 4 },
+  ],
+  openai: [
+    { name: 'GPT-4o', id: 'gpt-4o', input: 2.5, cached: 1.25, output: 10 },
+    { name: 'GPT-4o mini', id: 'gpt-4o-mini', input: 0.15, cached: 0.075, output: 0.6 },
+  ],
+  gemini: [
+    { name: 'Gemini 2.5 Pro', id: 'gemini-2.5-pro', input: 1.25, cached: 0.315, output: 10 },
+    { name: 'Gemini 2.5 Flash', id: 'gemini-2.5-flash', input: 0.15, cached: 0.0375, output: 0.6 },
+  ],
+};
+
+function Calculator() {
+  const [provider, setProvider] = useState<keyof typeof MODELS>('anthropic');
+  const [modelIdx, setModelIdx] = useState(0);
+  const [requestsPerDay, setRequestsPerDay] = useState(100);
+  const [systemPromptTokens, setSystemPromptTokens] = useState(3000);
+
+  const model = MODELS[provider][modelIdx];
+  const monthlyRequests = requestsPerDay * 30;
+  const costWithout = (monthlyRequests * (systemPromptTokens + 500) / 1_000_000) * model.input + (monthlyRequests * 200 / 1_000_000) * model.output;
+  const costWith = (monthlyRequests * systemPromptTokens / 1_000_000) * model.input + (monthlyRequests * 500 / 1_000_000) * (model.cached * 0.25 + model.cached * 0.75) + (monthlyRequests * 200 / 1_000_000) * model.output;
+  const savings = costWithout - costWith;
+  const savingsPercent = costWithout > 0 ? (savings / costWithout) * 100 : 0;
+
+  return (
+    <section style={{ paddingTop: 72, paddingBottom: 72, borderBottom: `2px solid ${ink}` }}>
+      <Kicker>Cost Calculator</Kicker>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+        <div>
+          <div style={{ marginBottom: 32 }}>
+            <label style={{ ...mono, fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: gray, display: "block", marginBottom: 8 }}>PROVIDER</label>
+            <select value={provider} onChange={(e) => { setProvider(e.target.value as keyof typeof MODELS); setModelIdx(0); }}
+              style={{ ...sans, fontSize: 14, padding: "10px 12px", border: `1px solid ${hairline}`, width: "100%", cursor: "pointer" }}>
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI (GPT)</option>
+              <option value="gemini">Google (Gemini)</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: 32 }}>
+            <label style={{ ...mono, fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: gray, display: "block", marginBottom: 8 }}>MODEL</label>
+            <select value={modelIdx} onChange={(e) => setModelIdx(parseInt(e.target.value))}
+              style={{ ...sans, fontSize: 14, padding: "10px 12px", border: `1px solid ${hairline}`, width: "100%", cursor: "pointer" }}>
+              {MODELS[provider].map((m, i) => <option key={i} value={i}>{m.name}</option>)}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: 32 }}>
+            <label style={{ ...mono, fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: gray, display: "block", marginBottom: 8 }}>REQUESTS/DAY</label>
+            <input type="range" min="10" max="50000" step="10" value={requestsPerDay}
+              onChange={(e) => setRequestsPerDay(parseInt(e.target.value))}
+              style={{ width: "100%" }} />
+            <div style={{ ...sans, fontSize: 14, marginTop: 8 }}>{requestsPerDay.toLocaleString()} req/day</div>
+          </div>
+
+          <div>
+            <label style={{ ...mono, fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: gray, display: "block", marginBottom: 8 }}>SYSTEM PROMPT (tokens)</label>
+            <input type="range" min="100" max="10000" step="100" value={systemPromptTokens}
+              onChange={(e) => setSystemPromptTokens(parseInt(e.target.value))}
+              style={{ width: "100%" }} />
+            <div style={{ ...sans, fontSize: 14, marginTop: 8 }}>{systemPromptTokens.toLocaleString()} tokens</div>
+          </div>
+        </div>
+
+        <div style={{ background: paper, border: `2px solid ${ink}`, padding: 32 }}>
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ ...mono, fontSize: 10, fontWeight: 700, letterSpacing: "1.5px", color: gray, marginBottom: 4 }}>WITHOUT CACHELLM</div>
+            <div style={{ ...serif, fontSize: 32, fontWeight: 700 }}>${costWithout.toFixed(2)}<span style={{ fontSize: 14, color: gray }}>/mo</span></div>
+          </div>
+
+          <div style={{ paddingTop: 24, borderTop: `1px solid ${hairline}`, marginBottom: 24 }}>
+            <div style={{ ...mono, fontSize: 10, fontWeight: 700, letterSpacing: "1.5px", color: ink, marginBottom: 4 }}>WITH CACHELLM</div>
+            <div style={{ ...serif, fontSize: 32, fontWeight: 700 }}>${costWith.toFixed(2)}<span style={{ fontSize: 14, color: gray }}>/mo</span></div>
+          </div>
+
+          <div style={{ paddingTop: 24, borderTop: `2px solid ${ink}` }}>
+            <div style={{ ...mono, fontSize: 10, fontWeight: 700, letterSpacing: "1.5px", color: gray, marginBottom: 8 }}>MONTHLY SAVINGS</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <div style={{ ...serif, fontSize: 28, fontWeight: 700 }}>${savings.toFixed(2)}</div>
+              <div style={{ ...mono, fontSize: 18, fontWeight: 700, color: ink }}>{savingsPercent.toFixed(0)}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── MAIN ────────────────────────────────────────────────────────────
 type CopiedType = false | "npm" | "pip";
 
@@ -299,6 +393,9 @@ export default function Home() {
           )}
           <p style={{ ...mono, fontSize: 10, letterSpacing: "0.5px", color: gray, marginTop: 20, opacity: 0.5 }}>Based on Claude Sonnet, 3K token system prompt, 90% cache hit rate.</p>
         </section>
+
+        {/* ── CALCULATOR ── */}
+        <Calculator />
 
         {/* ── PRINCIPLES ── */}
         <section style={{ paddingTop: mobile ? 48 : 72, paddingBottom: mobile ? 48 : 72, borderBottom: `2px solid ${ink}` }}>
