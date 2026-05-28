@@ -1,11 +1,10 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/cachellm-white?style=for-the-badge&labelColor=000&color=000&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRleHQgeD0iNCIgeT0iMTgiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXdlaWdodD0iYm9sZCI+Qzwv dGV4dD48L3N2Zz4=">
-    <img alt="cachellm" src="https://img.shields.io/badge/cachellm-black?style=for-the-badge&labelColor=fff&color=fff">
-  </picture>
-</p>
+<div align="center">
 
-<h3 align="center">Your LLM calls are wasting money. Fix it in one line.</h3>
+# ⚡ cachellm
+
+### Your LLM calls are wasting money. Fix it in one line.
+
+</div>
 
 <p align="center">
   Wraps your Anthropic / OpenAI / Gemini SDK client. Analyzes prompt stability.<br>
